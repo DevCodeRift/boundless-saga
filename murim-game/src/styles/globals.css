@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Murim Theme Custom Styles */
+
+body {
+  font-family: theme('fontFamily.cultivation');
+  background-color: theme('colors.void');
+  color: theme('colors.silver');
+}
+
+/* Animated background elements for murim aesthetics */
+.qi-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 30% 40%, theme('colors.jade') 0%, transparent 70%),
+              radial-gradient(circle at 70% 60%, theme('colors.gold') 0%, transparent 80%);
+  opacity: 0.18;
+  animation: qi-flow 8s ease-in-out infinite alternate;
+}
+
+.floating-runes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url('/runes.svg');
+  background-repeat: repeat;
+  opacity: 0.08;
+  animation: blade-shine 12s linear infinite;
+}
+
+/* Example custom font usage */
+.font-ancient {
+  font-family: theme('fontFamily.ancient');
+}
+
+/* Keyframes for custom animations (should match tailwind.config.js) */
+@keyframes qi-flow {
+  0% { filter: blur(0px) brightness(1); }
+  50% { filter: blur(4px) brightness(1.2); }
+  100% { filter: blur(0px) brightness(1); }
+}
+
+@keyframes blade-shine {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+@keyframes cultivation-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.04); }
+}
