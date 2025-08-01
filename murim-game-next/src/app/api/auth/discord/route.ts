@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       user_id: user.id,
       device_fingerprint: deviceFingerprint,
       ip_address: ip,
-      user_agent: browserFingerprint?.userAgent,
+      user_agent: (typeof browserFingerprint === 'object' && browserFingerprint !== null && browserFingerprint.userAgent) ? browserFingerprint.userAgent : null,
       last_seen: new Date().toISOString(),
       is_trusted: true,
     },
