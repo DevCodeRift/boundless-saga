@@ -1,8 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// Dummy fingerprinting for demo; replace with your real logic
 function getDeviceFingerprint() {
   return window.localStorage.getItem("deviceFingerprint") || "demo-device-fingerprint";
 }
@@ -14,7 +13,7 @@ function getBrowserFingerprint() {
   };
 }
 
-export default function DiscordOAuthCallbackPage() {
+function DiscordOAuthCallbackInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -47,5 +46,13 @@ export default function DiscordOAuthCallbackPage() {
       {error && <div className="text-red-500">{error}</div>}
       {!error && <div className="text-gray-500">Please wait, redirecting...</div>}
     </main>
+  );
+}
+
+export default function DiscordOAuthCallbackPage() {
+  return (
+    <Suspense>
+      <DiscordOAuthCallbackInner />
+    </Suspense>
   );
 }
