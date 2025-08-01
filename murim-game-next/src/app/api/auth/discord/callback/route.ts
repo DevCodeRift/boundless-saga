@@ -24,6 +24,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(error, { status: res.status });
   }
 
-  // On success, redirect to dashboard
-  return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_BASE_URL || 'https://www.boundless-saga.com'));
+  // On success, redirect to dashboard with 303 status so browser uses GET
+  return NextResponse.redirect(
+    new URL('/dashboard', process.env.NEXT_PUBLIC_BASE_URL || 'https://www.boundless-saga.com'),
+    { status: 303 }
+  );
 }
