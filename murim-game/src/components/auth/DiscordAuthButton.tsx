@@ -5,14 +5,9 @@ const REDIRECT_URI = 'https://www.boundless-saga.com/discord-oauth-callback';
 
 const DiscordAuthButton: React.FC = () => {
   const handleDiscordLogin = () => {
-    const params = new URLSearchParams({
-      client_id: DISCORD_CLIENT_ID,
-      redirect_uri: REDIRECT_URI,
-      response_type: 'code',
-      scope: 'identify email',
-      prompt: 'consent',
-    });
-    window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    const url = `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20email&prompt=consent`;
+    console.log('Discord OAuth URL:', url);
+    window.location.href = url;
   };
 
   return (
