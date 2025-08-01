@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Murim custom theme colors */
+:root {
+  --color-void: #18181b;
+  --color-shadow: #23232a;
+  --color-obsidian: #2d2d36;
+  --color-gold: #ffd700;
+  --color-discord: #5865f2;
+  --color-discord-dark: #404eed;
+}
+
+.bg-gradient-to-br {
+  background: linear-gradient(135deg, var(--color-void), var(--color-shadow), var(--color-obsidian));
+}
+
+.text-gold {
+  color: var(--color-gold);
+}
+.bg-gold {
+  background: var(--color-gold);
+}
+.bg-discord {
+  background: var(--color-discord);
+}
+.bg-discord-dark {
+  background: var(--color-discord-dark);
+}
+
+.font-cultivation {
+  font-family: 'Cinzel', 'serif';
+}
+
+/* Animated background elements */
+.qi-particles {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0, transparent 70%);
+  animation: qi-float 8s infinite alternate ease-in-out;
+  z-index: 0;
+}
+
+@keyframes qi-float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-20px); }
+}
+
+.floating-runes {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: repeating-linear-gradient(120deg, rgba(255,215,0,0.04) 0 2px, transparent 2px 40px);
+  animation: runes-float 12s infinite alternate ease-in-out;
+  z-index: 0;
+}
+
+@keyframes runes-float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(30px); }
+}
