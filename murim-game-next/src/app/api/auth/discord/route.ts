@@ -48,12 +48,17 @@ export async function POST(req: NextRequest) {
   }
 
   // Check for existing user by discord_id, device, or IP
+  // Build .or() filter dynamically
+  let orFilters = [`discord_id.eq.${discordUser.id}`];
+  if (deviceFingerprint) orFilters.push(`device_fingerprint.eq.${deviceFingerprint}`);
+  if (ip) orFilters.push(`ip_addresses.cs.{${ip}}`);
+  if (typeof browserFingerprint === 'object' && browserFingerprint !== null && !Array.isArray(browserFingerprint)) {
+    orFilters.push(`browser_fingerprint.eq.${JSON.stringify(browserFingerprint)}`);
+  }
   const { data: existingUsers, error: findError } = await supabase
     .from('users')
     .select('id')
-    .or(
-      `discord_id.eq.${discordUser.id},device_fingerprint.eq.${deviceFingerprint},ip_addresses.cs.{${ip}},browser_fingerprint.eq.${JSON.stringify(browserFingerprint)}`
-    );
+    .or(orFilters.join(','));
   if (findError) {
     console.error('Supabase find user error:', findError);
     return NextResponse.json({ error: 'Database error', details: findError.message }, { status: 500 });
