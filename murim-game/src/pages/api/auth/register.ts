@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email, password, deviceFingerprint, browserFingerprint } = req.body;
+  const { email, deviceFingerprint, browserFingerprint } = req.body;
   const ip = getIp(req);
 
   // Check for existing user with same email, device, or IP

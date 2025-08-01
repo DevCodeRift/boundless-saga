@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabase } from '../../../lib/db';
-import fetch from 'node-fetch';
 
 function getIp(req: NextApiRequest): string {
   return (

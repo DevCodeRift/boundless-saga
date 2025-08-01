@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 
 // Utility functions (same as in EmailAuthForm)
 const generateDeviceFingerprint = () => {

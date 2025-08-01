@@ -3,6 +3,7 @@
 ## Additional Project Instructions
 
 1. Any new instructions or process changes must be added to this instructions.md document for future reference.
+2. After any code or process change, always update this file to reflect the latest state and push all changes to GitHub.
 2. When creating new database tables (e.g., in Supabase), always keep a log of table names and their purposes in this document to avoid forgetting them.
 3. All code snippets and implementations must include clear explanations of what they are and why they are included.
 4. Maintain a separate context document (see below) to help team members and Copilot quickly locate files, tables, and key resources for future usage.
