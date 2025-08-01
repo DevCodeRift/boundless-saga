@@ -64,6 +64,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Create user
+  // Log for debugging
+  console.log('DEBUG: browserFingerprint type:', typeof browserFingerprint, 'value:', browserFingerprint);
+  // Defensive: only allow object or null for jsonb
+  let safeBrowserFingerprint = null;
+  if (typeof browserFingerprint === 'object' && browserFingerprint !== null && !Array.isArray(browserFingerprint)) {
+    safeBrowserFingerprint = browserFingerprint;
+  }
   const { data: user, error: createError } = await supabase
     .from('users')
     .insert([
@@ -75,7 +82,7 @@ export async function POST(req: NextRequest) {
         avatar_url: discordUser.avatar ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png` : null,
         device_fingerprint: deviceFingerprint,
         ip_addresses: [ip],
-        browser_fingerprint: (typeof browserFingerprint === 'object' && browserFingerprint !== null) ? browserFingerprint : null,
+        browser_fingerprint: safeBrowserFingerprint,
         email_verified: discordUser.verified,
         is_banned: false,
       },
@@ -93,7 +100,9 @@ export async function POST(req: NextRequest) {
       user_id: user.id,
       device_fingerprint: deviceFingerprint,
       ip_address: ip,
-      user_agent: (typeof browserFingerprint === 'object' && browserFingerprint !== null && browserFingerprint.userAgent) ? browserFingerprint.userAgent : null,
+      user_agent: (typeof browserFingerprint === 'object' && browserFingerprint !== null && browserFingerprint.userAgent)
+        ? String(browserFingerprint.userAgent)
+        : (typeof browserFingerprint === 'string' ? browserFingerprint : null),
       last_seen: new Date().toISOString(),
       is_trusted: true,
     },
