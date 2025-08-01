@@ -124,6 +124,6 @@ export async function POST(req: NextRequest) {
   if (updateError) {
     console.error('Supabase user update error:', updateError);
   }
-
-  return NextResponse.json({ user: { id: user.id, email: user.email, username: user.username } });
+  // Redirect to dashboard after successful login
+  return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_BASE_URL || 'https://www.boundless-saga.com'));
 }
