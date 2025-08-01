@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
 
   // Check for existing user by discord_id, device, or IP
   // Build .or() filter dynamically
-  let orFilters = [`discord_id.eq.${discordUser.id}`];
+const orFilters = [`discord_id.eq.${discordUser.id}`];
   if (deviceFingerprint) orFilters.push(`device_fingerprint.eq.${deviceFingerprint}`);
   if (ip) orFilters.push(`ip_addresses.cs.{${ip}}`);
   if (typeof browserFingerprint === 'object' && browserFingerprint !== null && !Array.isArray(browserFingerprint)) {
