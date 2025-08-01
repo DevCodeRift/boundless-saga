@@ -33,6 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
   const tokenData = await tokenRes.json();
   if (!tokenRes.ok) {
+    console.error('Discord token error:', tokenData);
     return res.status(401).json({ error: 'Failed to get Discord token', details: tokenData });
   }
 
@@ -42,6 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
   const discordUser = await userRes.json();
   if (!userRes.ok) {
+    console.error('Discord user error:', discordUser);
     return res.status(401).json({ error: 'Failed to get Discord user', details: discordUser });
   }
 
@@ -53,9 +55,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       `discord_id.eq.${discordUser.id},device_fingerprint.eq.${deviceFingerprint},ip_addresses.cs.{${ip}},browser_fingerprint.eq.${JSON.stringify(browserFingerprint)}`
     );
   if (findError) {
+    console.error('Supabase find user error:', findError);
     return res.status(500).json({ error: 'Database error', details: findError.message });
   }
   if (existingUsers && existingUsers.length > 0) {
+    console.warn('Duplicate user detected:', existingUsers);
     return res.status(409).json({ error: 'Account already exists for this device or IP.' });
   }
 
@@ -79,11 +83,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .select()
     .single();
   if (createError) {
+    console.error('Supabase create user error:', createError);
     return res.status(500).json({ error: 'Failed to create user', details: createError.message });
   }
 
   // Device tracking
-  await supabase.from('user_devices').upsert([
+  const { error: deviceError } = await supabase.from('user_devices').upsert([
     {
       user_id: user.id,
       device_fingerprint: deviceFingerprint,
@@ -93,9 +98,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       is_trusted: true,
     },
   ]);
+  if (deviceError) {
+    console.error('Supabase device upsert error:', deviceError);
+  }
 
   // Log login attempt
-  await supabase.from('login_attempts').insert([
+  const { error: loginError } = await supabase.from('login_attempts').insert([
     {
       identifier: discordUser.id,
       ip_address: ip,
@@ -104,12 +112,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       attempt_time: new Date().toISOString(),
     },
   ]);
+  if (loginError) {
+    console.error('Supabase login attempt error:', loginError);
+  }
 
   // Update user's last_login and ip_addresses
-  await supabase.from('users').update({
+  const { error: updateError } = await supabase.from('users').update({
     last_login: new Date().toISOString(),
     ip_addresses: user.ip_addresses ? [...new Set([...user.ip_addresses, ip])] : [ip],
   }).eq('id', user.id);
+  if (updateError) {
+    console.error('Supabase user update error:', updateError);
+  }
 
   return res.status(200).json({ user: { id: user.id, email: user.email, username: user.username } });
 }

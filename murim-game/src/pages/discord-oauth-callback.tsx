@@ -62,8 +62,10 @@ const DiscordOAuthCallback = () => {
           setMessage(data.error || 'Discord authentication failed.');
         } else {
           setStatus('success');
-          setMessage('Discord authentication successful!');
-          // Optionally: navigate('/dashboard') or close modal
+          setMessage('Discord authentication successful! Redirecting...');
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1200);
         }
       } catch (err) {
         setStatus('error');
