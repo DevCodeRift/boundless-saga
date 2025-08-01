@@ -26,7 +26,7 @@ Building a cross-platform text-based game with React web app, React Native mobil
 1. Create homepage with futuristic murim styling
 2. Implement dual authentication (Email + Discord OAuth)
 3. Set up robust user management with anti-duplicate measures
-4. Deploy to production with custom domain
+4. Deploy to production with custom domain (official: https://www.boundless-saga.com, boundless-saga.com)
 
 ## Tech Stack Requirements
 
@@ -352,6 +352,8 @@ export const registerUser = async (userData: UserRegistration) => {
    - In Vercel dashboard, go to Project Settings → Environment Variables
    - Add all variables from your `.env.local` file
    - Set different values for production (production database URLs, etc.)
+   - For Discord OAuth, use https://www.boundless-saga.com/discord-oauth-callback as the production redirect URI.
+   - For NEXTAUTH_URL, use https://www.boundless-saga.com in production.
 
 4. **Custom Domain Configuration:**
    - In Project Settings → Domains

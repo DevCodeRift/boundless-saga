@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   params.append('client_secret', process.env.DISCORD_CLIENT_SECRET!);
   params.append('grant_type', 'authorization_code');
   params.append('code', code);
-  params.append('redirect_uri', process.env.NEXTAUTH_URL + '/api/auth/discord/callback');
+  params.append('redirect_uri', 'https://www.boundless-saga.com/api/auth/discord/callback');
   params.append('scope', 'identify email');
 
   const tokenRes = await fetch('https://discord.com/api/oauth2/token', {

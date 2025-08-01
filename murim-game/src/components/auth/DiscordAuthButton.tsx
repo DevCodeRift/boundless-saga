@@ -1,7 +1,7 @@
 import React from 'react';
 
 const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID || '';
-const REDIRECT_URI = window.location.origin + '/discord-oauth-callback';
+const REDIRECT_URI = 'https://www.boundless-saga.com/discord-oauth-callback';
 
 const DiscordAuthButton: React.FC = () => {
   const handleDiscordLogin = () => {
