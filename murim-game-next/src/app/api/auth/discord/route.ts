@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
         avatar_url: discordUser.avatar ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png` : null,
         device_fingerprint: deviceFingerprint,
         ip_addresses: [ip],
-        browser_fingerprint: browserFingerprint,
+        browser_fingerprint: (typeof browserFingerprint === 'object' && browserFingerprint !== null) ? browserFingerprint : null,
         email_verified: discordUser.verified,
         is_banned: false,
       },
