@@ -2,10 +2,21 @@
 import React from 'react';
 
 
-const DiscordAuthButton: React.FC = () => {
+
+interface DiscordAuthButtonProps {
+  mode: 'signup' | 'signin';
+}
+
+const DiscordAuthButton: React.FC<DiscordAuthButtonProps> = ({ mode }) => {
   const handleDiscordLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI || process.env.DISCORD_REDIRECT_URI;
+    let redirectUri = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI || process.env.DISCORD_REDIRECT_URI;
+    // Append mode as a query param to the redirect_uri
+    if (redirectUri) {
+      const url = new URL(redirectUri);
+      url.searchParams.set('mode', mode);
+      redirectUri = url.toString();
+    }
     const discordUrl =
       `https://discord.com/oauth2/authorize?client_id=${clientId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri ?? '')}` +
@@ -18,7 +29,7 @@ const DiscordAuthButton: React.FC = () => {
       onClick={handleDiscordLogin}
       type="button"
     >
-      Sign in with Discord
+      {mode === 'signup' ? 'Sign up with Discord' : 'Sign in with Discord'}
     </button>
   );
 };
