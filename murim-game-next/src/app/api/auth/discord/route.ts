@@ -15,12 +15,16 @@ export async function POST(req: NextRequest) {
 
 
   const body = await req.json();
-  const { code, deviceFingerprint, browserFingerprint } = body;
+  const { code, deviceFingerprint, browserFingerprint, mode } = body;
   const ip = getIp(req);
 
   // Defensive: deviceFingerprint must be present
   if (!deviceFingerprint) {
     return NextResponse.json({ error: 'Missing device fingerprint' }, { status: 400 });
+  }
+  // Defensive: mode must be present and valid
+  if (!mode || (mode !== 'signup' && mode !== 'signin')) {
+    return NextResponse.json({ error: 'Missing or invalid mode (signup/signin)' }, { status: 400 });
   }
 
   // Exchange code for Discord access token
@@ -55,7 +59,7 @@ export async function POST(req: NextRequest) {
 
   // Check for existing user by discord_id, device, or IP
   // Build .or() filter dynamically
-const orFilters = [`discord_id.eq.${discordUser.id}`];
+  const orFilters = [`discord_id.eq.${discordUser.id}`];
   if (deviceFingerprint) orFilters.push(`device_fingerprint.eq.${deviceFingerprint}`);
   if (ip) orFilters.push(`ip_addresses.cs.{${ip}}`);
   if (typeof browserFingerprint === 'object' && browserFingerprint !== null && !Array.isArray(browserFingerprint)) {
@@ -63,15 +67,65 @@ const orFilters = [`discord_id.eq.${discordUser.id}`];
   }
   const { data: existingUsers, error: findError } = await supabase
     .from('users')
-    .select('id')
+    .select('*')
     .or(orFilters.join(','));
   if (findError) {
     console.error('Supabase find user error:', findError);
     return NextResponse.json({ error: 'Database error', details: findError.message }, { status: 500 });
   }
-  if (existingUsers && existingUsers.length > 0) {
-    console.warn('Duplicate user detected:', existingUsers);
-    return NextResponse.json({ error: 'Account already exists for this device or IP.' }, { status: 409 });
+
+  if (mode === 'signup') {
+    if (existingUsers && existingUsers.length > 0) {
+      console.warn('Duplicate user detected:', existingUsers);
+      return NextResponse.json({ error: 'Account already exists for this device or IP.' }, { status: 409 });
+    }
+    // ...proceed to create user (existing code below)...
+  }
+  if (mode === 'signin') {
+    if (!existingUsers || existingUsers.length === 0) {
+      return NextResponse.json({ error: 'No account found for this device or Discord account. Please sign up first.' }, { status: 404 });
+    }
+    // User exists, treat as login: update last_login, log attempt, upsert device, etc.
+    const user = existingUsers[0];
+    // Device tracking
+    const { error: deviceError } = await supabase.from('user_devices').upsert([
+      {
+        user_id: user.id,
+        device_fingerprint: deviceFingerprint,
+        ip_address: ip,
+        user_agent: (typeof browserFingerprint === 'object' && browserFingerprint !== null && browserFingerprint.userAgent)
+          ? String(browserFingerprint.userAgent)
+          : (typeof browserFingerprint === 'string' ? browserFingerprint : null),
+        last_seen: new Date().toISOString(),
+        is_trusted: true,
+      },
+    ]);
+    if (deviceError) {
+      console.error('Supabase device upsert error:', deviceError);
+    }
+    // Log login attempt
+    const { error: loginError } = await supabase.from('login_attempts').insert([
+      {
+        identifier: discordUser.id,
+        ip_address: ip,
+        success: true,
+        device_fingerprint: deviceFingerprint,
+        attempt_time: new Date().toISOString(),
+      },
+    ]);
+    if (loginError) {
+      console.error('Supabase login attempt error:', loginError);
+    }
+    // Update user's last_login and ip_addresses
+    const { error: updateError } = await supabase.from('users').update({
+      last_login: new Date().toISOString(),
+      ip_addresses: user.ip_addresses ? [...new Set([...user.ip_addresses, ip])] : [ip],
+    }).eq('id', user.id);
+    if (updateError) {
+      console.error('Supabase user update error:', updateError);
+    }
+    // Redirect to dashboard after successful login
+    return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_BASE_URL || 'https://www.boundless-saga.com'));
   }
 
   // Create user
