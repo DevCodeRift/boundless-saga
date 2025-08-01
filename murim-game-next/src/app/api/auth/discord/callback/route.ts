@@ -15,7 +15,12 @@ export async function GET(req: NextRequest) {
   });
 
   if (!res.ok) {
-    const error = await res.json();
+    let error;
+    try {
+      error = await res.json();
+    } catch (e) {
+      error = { error: 'Unknown error', details: 'Failed to parse error response from Discord handler.' };
+    }
     return NextResponse.json(error, { status: res.status });
   }
 

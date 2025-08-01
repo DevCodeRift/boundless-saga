@@ -13,9 +13,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
   }
 
+
   const body = await req.json();
   const { code, deviceFingerprint, browserFingerprint } = body;
   const ip = getIp(req);
+
+  // Defensive: deviceFingerprint must be present
+  if (!deviceFingerprint) {
+    return NextResponse.json({ error: 'Missing device fingerprint' }, { status: 400 });
+  }
 
   // Exchange code for Discord access token
   const params = new URLSearchParams();
